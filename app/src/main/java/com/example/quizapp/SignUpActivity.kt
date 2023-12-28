@@ -6,12 +6,17 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class SignUpActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
+
+        auth = FirebaseAuth.getInstance()
 
         val editTextSignUpEmail = findViewById<EditText>(R.id.editTextSignUpEmail)
         val editTextSignUpPassword = findViewById<EditText>(R.id.editTextSignUpPassword)
@@ -22,21 +27,25 @@ class SignUpActivity : AppCompatActivity() {
             val signUpEmail = editTextSignUpEmail.text.toString()
             val signUpPassword = editTextSignUpPassword.text.toString()
 
-            // TODO: Implement your Sign Up logic here
-            // For now, you can print the email and password
-            println("Sign Up Email: $signUpEmail, Password: $signUpPassword")
-
-            // TODO: Add logic to create a new user (e.g., store credentials in a database)
-
-            // For testing purposes, let's open a new activity (replace it with your actual logic)
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            createAccount(signUpEmail, signUpPassword)
         }
 
         textViewSignIn.setOnClickListener {
-            // Navigate to the Sign In page
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun createAccount(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    // If sign-up fails, display a message to the user.
+                    // You can handle errors or display a message to the user here
+                }
+            }
     }
 }
